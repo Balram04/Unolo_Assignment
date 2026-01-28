@@ -99,3 +99,39 @@ Changed column names from `lat, lng` to `latitude, longitude` to match the schem
 
 **Why this is correct:**
 Column names in SQL queries must match the actual database schema. The database table `checkins` has columns named `latitude` and `longitude`, not `lat` and `lng`.
+
+---
+
+## Bug #5: SQL injection vulnerability in history endpoint
+**Location:** `backend/routes/checkin.js` - Lines 113-119  
+**Severity:** Critical (Security Issue)
+
+**What was wrong:**
+```javascript
+if (start_date) {
+    query += ` AND DATE(ch.checkin_time) >= '${start_date}'`;
+}
+if (end_date) {
+    query += ` AND DATE(ch.checkin_time) <= '${end_date}'`;
+}
+```
+User input (`start_date` and `end_date`) is concatenated directly into the SQL query, creating a SQL injection vulnerability.
+
+**How I fixed it:**
+```javascript
+if (start_date) {
+    query += ` AND DATE(ch.checkin_time) >= ?`;
+    params.push(start_date);
+}
+if (end_date) {
+    query += ` AND DATE(ch.checkin_time) <= ?`;
+    params.push(end_date);
+}
+```
+Used parameterized queries with placeholders (?) and added values to params array.
+
+**Why this is correct:**
+Parameterized queries prevent SQL injection attacks by ensuring user input is properly escaped. Never concatenate user input directly into SQL strings.
+
+---
+

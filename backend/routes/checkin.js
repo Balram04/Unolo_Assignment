@@ -108,7 +108,7 @@ router.get('/history', authenticateToken, async (req, res) => {
             WHERE ch.employee_id = ?
         `;
         const params = [req.user.id];
-
+//fixing sql injection issue
         if (start_date) {
             query += ` AND DATE(ch.checkin_time) >= ?`;
             params.push(start_date);
