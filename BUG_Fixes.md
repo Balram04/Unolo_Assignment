@@ -135,3 +135,23 @@ Parameterized queries prevent SQL injection attacks by ensuring user input is pr
 
 ---
 
+## Bug #6: SQLite syntax error - Double quotes for string literals
+**Location:** `backend/routes/checkin.js` - Line 45  
+**Severity:** High
+
+**What was wrong:**
+```javascript
+'SELECT * FROM checkins WHERE employee_id = ? AND status = "checked_in"'
+```
+Used double quotes for string literal "checked_in". In SQLite, double quotes denote column/table identifiers, causing error: "no such column: checked_in".
+
+**How I fixed it:**
+```javascript
+'SELECT * FROM checkins WHERE employee_id = ? AND status = \'checked_in\''
+```
+Changed double quotes to single quotes (escaped with backslash).
+
+**Why this is correct:**
+SQLite interprets double quotes as identifiers (column names), single quotes as string literals. Using wrong quotes causes runtime error.
+
+---
