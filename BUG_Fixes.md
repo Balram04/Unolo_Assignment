@@ -201,3 +201,29 @@ Added `e.preventDefault()` at the start of the handler.
 Prevents default form submission behavior that causes full page reload, allowing React to handle submission via AJAX.
 
 ---
+## Bug #11: History page crashes on load - null state error
+**Location:** `frontend/src/pages/History.jsx` - Lines 5, 43  
+**Severity:** Critical
+
+**What was wrong:**
+```javascript
+const [checkins, setCheckins] = useState(null);
+// ...later...
+const totalHours = checkins.reduce((total, checkin) => {
+```
+Initial state set to `null` instead of empty array. Calling `.reduce()` on `null` causes crash on component mount.
+
+**How I fixed it:**
+```javascript
+const [checkins, setCheckins] = useState([]);
+// ...later...
+const totalHours = checkins?.reduce((total, checkin) => {
+    // ...
+}, 0) || 0;
+```
+Changed initial state to empty array and added optional chaining with fallback value.
+
+**Why this is correct:**
+Array methods like `reduce()` cannot be called on `null`. Initial state should match expected data type (array). Optional chaining prevents crashes if data is unexpectedly null.
+
+---

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../utils/api';
 
 function History({ user }) {
-    const [checkins, setCheckins] = useState(null);
+    const [checkins, setCheckins] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [startDate, setStartDate] = useState('');
@@ -10,6 +10,7 @@ function History({ user }) {
 
     useEffect(() => {
         fetchHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchHistory = async () => {
@@ -42,7 +43,7 @@ function History({ user }) {
         fetchHistory();
     };
 
-    const totalHours = checkins.reduce((total, checkin) => {
+    const totalHours = checkins?.reduce((total, checkin) => {
         if (checkin.checkout_time) {
             const checkinTime = new Date(checkin.checkin_time);
             const checkoutTime = new Date(checkin.checkout_time);
@@ -50,7 +51,7 @@ function History({ user }) {
             return total + hours;
         }
         return total;
-    }, 0);
+    }, 0) || 0;
 
     if (loading) {
         return (
