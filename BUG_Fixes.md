@@ -1,4 +1,5 @@
 ## Bug #1: Login password comparison not awaited
+
 **Location:** `backend/routes/auth.js` - Line 27  
 **Severity:** Critical
 
@@ -48,3 +49,26 @@ Even though the password is hashed, exposing it increases security risk because 
 Sensitive data like passwords should never be included in JWTs Hackers can guess it .
 
 ---
+
+## Bug #3: Check-in returns wrong HTTP status code on validation error
+**Location:** `backend/routes/checkin.js` - Line 29  
+**Severity:** Medium
+
+**What was wrong:**
+```javascript
+if (!client_id) {
+    return res.status(200).json({ success: false, message: 'Client ID is required' });
+}
+```
+Returns HTTP 200 (OK) for a validation error, which is semantically incorrect.
+
+**How I fixed it:**
+```javascript
+if (!client_id) {
+    return res.status(400).json({ success: false, message: 'Client ID is required' });
+}
+```
+Changed status code to 400 (Bad Request).
+
+**Why this is correct:**
+HTTP 400 is the correct status code for client-side validation errors. HTTP 200 should only be used for successful requests.
