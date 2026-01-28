@@ -21,7 +21,7 @@ router.get('/stats', authenticateToken, requireManager, async (req, res) => {
              FROM checkins ch
              INNER JOIN users u ON ch.employee_id = u.id
              INNER JOIN clients c ON ch.client_id = c.id
-             WHERE u.manager_id = ? AND date(ch.checkin_time) = ?
+             WHERE u.manager_id = ? AND DATE(ch.checkin_time) = ?
              ORDER BY ch.checkin_time DESC`,
             [req.user.id, today]
         );
@@ -59,7 +59,7 @@ router.get('/employee', authenticateToken, async (req, res) => {
             `SELECT ch.*, c.name as client_name
              FROM checkins ch
              INNER JOIN clients c ON ch.client_id = c.id
-             WHERE ch.employee_id = ? AND date(ch.checkin_time) = ?
+             WHERE ch.employee_id = ? AND DATE(ch.checkin_time) = ?
              ORDER BY ch.checkin_time DESC`,
             [req.user.id, today]
         );
@@ -77,7 +77,7 @@ router.get('/employee', authenticateToken, async (req, res) => {
             `SELECT COUNT(*) as total_checkins,
                     COUNT(DISTINCT client_id) as unique_clients
              FROM checkins
-             WHERE employee_id = ? AND checkin_time >= datetime('now', '-7 days')`,
+             WHERE employee_id = ? AND checkin_time >= DATETIME('now', '-7 days')`,
             [req.user.id]
         );
 
