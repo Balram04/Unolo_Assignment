@@ -64,45 +64,45 @@ Live feeds, notifications, dashboards that only consume data.
 
 **How it works:**
 
-The client sends a request, the server waits until data is available, responds, and the client immediately sends another request.
+In long polling, the client sends an HTTP request to the server and waits. If no new data is available, the server keeps the request open. As soon as data becomes available, the server sends the response and closes the connection. The client then immediately sends a new request to wait for the next update.
 
 **Pros:**
 
-- Works everywhere
-- Very simple setup
-- No special infrastructure
+- Works with standard HTTP, so it is supported everywhere
+- Very easy to implement using normal REST APIs
+- Does not require special infrastructure or protocols
 
 **Cons:**
 
-- Higher latency
-- Inefficient at scale
-- Wastes server and battery resources
+- Higher latency compared to real-time solutions
+- Inefficient at scale because many open requests consume server resources
+- Frequent network requests increase battery usage on mobile devices
 
 **When to use:**
 
-Fallback option or low-frequency updates.
+Long polling is best used as a fallback mechanism or for low-frequency updates. It is not suitable for high-scale or battery-sensitive real-time systems like continuous location tracking.
 
 ### 1.4 Third-Party Services (Firebase, Pusher, Ably)
 
 **How it works:**
 
-A managed service handles real-time connections and scaling. Your backend publishes updates to their API.
+Third-party services handle real-time communication for you. Your backend sends data to their service, and they deliver it to users instantly. You do not need to manage WebSocket connections or scaling yourself.
 
 **Pros:**
 
-- Fast to implement
-- No infrastructure management
-- SDKs for web and mobile
+- Very quick to set up and use
+- No need to manage servers or infrastructure
+- Ready SDKs available for web and mobile apps
 
 **Cons:**
 
-- Expensive at scale
-- Vendor lock-in
-- Less control over data flow
+- Becomes very expensive as users and updates increase
+- You depend on the service provider (vendor lock-in)
+- Less control over how your data is handled
 
 **When to use:**
 
-Early MVPs, demos, or teams without backend expertise.
+These services are good for small projects, MVPs, demos, or teams that do not have strong backend experience. They are not ideal for large-scale, long-term systems.
 
 ---
 
