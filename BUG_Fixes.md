@@ -134,28 +134,7 @@ Used parameterized queries with placeholders (?) and added values to params arra
 Parameterized queries prevent SQL injection attacks by ensuring user input is properly escaped. Never concatenate user input directly into SQL strings.
 
 ---
-
-## Bug #6: SQLite syntax error - Double quotes for string literals
-**Location:** `backend/routes/checkin.js` - Line 45  
-**Severity:** High
-
-**What was wrong:**
-```javascript
-'SELECT * FROM checkins WHERE employee_id = ? AND status = "checked_in"'
-```
-Used double quotes for string literal "checked_in". In SQLite, double quotes denote column/table identifiers, causing error: "no such column: checked_in".
-
-**How I fixed it:**
-```javascript
-'SELECT * FROM checkins WHERE employee_id = ? AND status = \'checked_in\''
-```
-Changed double quotes to single quotes (escaped with backslash).
-
-**Why this is correct:**
-SQLite interprets double quotes as identifiers (column names), single quotes as string literals. Using wrong quotes causes runtime error.
-
----
-## Bug #8: Dashboard using hardcoded user ID instead of role
+## Bug #6: Dashboard using hardcoded user ID instead of role
 **Location:** `frontend/src/pages/Dashboard.jsx` - Line 15  
 **Severity:** Medium
 
@@ -176,7 +155,7 @@ Role-based checks are more flexible and maintainable. User IDs can change; roles
 
 ---
 
-## Bug #10: Missing form preventDefault in CheckIn
+## Bug #7: Missing form preventDefault in CheckIn
 **Location:** `frontend/src/pages/CheckIn.jsx` - Line 59  
 **Severity:** Medium
 
@@ -201,7 +180,7 @@ Added `e.preventDefault()` at the start of the handler.
 Prevents default form submission behavior that causes full page reload, allowing React to handle submission via AJAX.
 
 ---
-## Bug #11: History page crashes on load - null state error
+## Bug #8: History page crashes on load - null state error
 **Location:** `frontend/src/pages/History.jsx` - Lines 5, 43  
 **Severity:** Critical
 
