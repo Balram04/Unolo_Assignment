@@ -155,3 +155,24 @@ Changed double quotes to single quotes (escaped with backslash).
 SQLite interprets double quotes as identifiers (column names), single quotes as string literals. Using wrong quotes causes runtime error.
 
 ---
+## Bug #8: Dashboard using hardcoded user ID instead of role
+**Location:** `frontend/src/pages/Dashboard.jsx` - Line 15  
+**Severity:** Medium
+
+**What was wrong:**
+```javascript
+const endpoint = user.id === 1 ? '/dashboard/stats' : '/dashboard/employee';
+```
+Hardcoded check for user.id === 1 to determine if manager. Breaks if manager has different ID.
+
+**How I fixed it:**
+```javascript
+const endpoint = user.role === 'manager' ? '/dashboard/stats' : '/dashboard/employee';
+```
+Changed to check user.role instead of ID.
+
+**Why this is correct:**
+Role-based checks are more flexible and maintainable. User IDs can change; roles represent actual permissions.
+
+---
+
