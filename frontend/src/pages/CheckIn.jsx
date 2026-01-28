@@ -15,6 +15,7 @@ function CheckIn({ user }) {
     useEffect(() => {
         fetchData();
         getCurrentLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchData = async () => {
@@ -56,6 +57,7 @@ function CheckIn({ user }) {
     };
 
     const handleCheckIn = async (e) => {
+        e.preventDefault();
         setError('');
         setSuccess('');
         setSubmitting(true);

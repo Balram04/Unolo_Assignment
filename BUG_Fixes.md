@@ -176,3 +176,28 @@ Role-based checks are more flexible and maintainable. User IDs can change; roles
 
 ---
 
+## Bug #10: Missing form preventDefault in CheckIn
+**Location:** `frontend/src/pages/CheckIn.jsx` - Line 59  
+**Severity:** Medium
+
+**What was wrong:**
+```javascript
+const handleCheckIn = async (e) => {
+    setError('');
+    setSuccess('');
+```
+Form submit handler missing `e.preventDefault()`, causing page reload on submission.
+
+**How I fixed it:**
+```javascript
+const handleCheckIn = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+```
+Added `e.preventDefault()` at the start of the handler.
+
+**Why this is correct:**
+Prevents default form submission behavior that causes full page reload, allowing React to handle submission via AJAX.
+
+---
