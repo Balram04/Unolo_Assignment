@@ -72,3 +72,30 @@ Changed status code to 400 (Bad Request).
 
 **Why this is correct:**
 HTTP 400 is the correct status code for client-side validation errors. HTTP 200 should only be used for successful requests.
+
+## Bug #4: SQL column names mismatch in check-in INSERT
+**Location:** `backend/routes/checkin.js` - Line 56  
+**Severity:** High
+
+**What was wrong:**
+```javascript
+await pool.execute(
+    `INSERT INTO checkins (employee_id, client_id, lat, lng, notes, status)
+     VALUES (?, ?, ?, ?, ?, 'checked_in')`,
+    [req.user.id, client_id, latitude, longitude, notes || null]
+);
+```
+The SQL uses column names `lat` and `lng`, but the database schema defines them as `latitude` and `longitude`.
+
+**How I fixed it:**
+```javascript
+await pool.execute(
+    `INSERT INTO checkins (employee_id, client_id, latitude, longitude, notes, status)
+     VALUES (?, ?, ?, ?, ?, 'checked_in')`,
+    [req.user.id, client_id, latitude, longitude, notes || null]
+);
+```
+Changed column names from `lat, lng` to `latitude, longitude` to match the schema.
+
+**Why this is correct:**
+Column names in SQL queries must match the actual database schema. The database table `checkins` has columns named `latitude` and `longitude`, not `lat` and `lng`.
