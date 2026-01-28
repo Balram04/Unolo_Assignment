@@ -11,6 +11,7 @@ function CheckIn({ user }) {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [distance, setDistance] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -55,6 +56,36 @@ function CheckIn({ user }) {
             );
         }
     };
+
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371; // Earth's radius in kilometers
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in kilometers
+    };
+
+    useEffect(() => {
+        if (selectedClient && location) {
+            const client = clients.find(c => c.id === parseInt(selectedClient));
+            if (client && client.latitude && client.longitude) {
+                const dist = calculateDistance(
+                    location.latitude,
+                    location.longitude,
+                    client.latitude,
+                    client.longitude
+                );
+                setDistance(dist);
+            } else {
+                setDistance(null);
+            }
+        } else {
+            setDistance(null);
+        }
+    }, [selectedClient, location, clients]);
 
     const handleCheckIn = async (e) => {
         e.preventDefault();
@@ -186,6 +217,26 @@ function CheckIn({ user }) {
                                 ))}
                             </select>
                         </div>
+
+                        {/* Distance Display */}
+                        {distance !== null && (
+                            <div className={`mb-4 p-3 rounded-md ${
+                                distance > 0.5 
+                                    ? 'bg-yellow-50 border border-yellow-200' 
+                                    : 'bg-green-50 border border-green-200'
+                            }`}>
+                                <p className={`text-sm font-medium ${
+                                    distance > 0.5 ? 'text-yellow-800' : 'text-green-800'
+                                }`}>
+                                    Distance from client: {distance.toFixed(2)} km
+                                </p>
+                                {distance > 0.5 && (
+                                    <p className="text-xs text-yellow-700 mt-1">
+                                        ⚠️ You are far from the client location
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-medium mb-2">

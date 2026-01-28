@@ -53,16 +53,39 @@ router.post('/', authenticateToken, async (req, res) => {
             });
         }
 
+        // Get client location for distance calculation
+        const [clients] = await pool.execute(
+            'SELECT latitude, longitude FROM clients WHERE id = ?',
+            [client_id]
+        );
+
+        let distance_from_client = null;
+        if (clients.length > 0 && latitude && longitude && clients[0].latitude && clients[0].longitude) {
+            // Calculate distance using Haversine formula
+            const R = 6371; // Earth's radius in kilometers
+            const lat1 = latitude * Math.PI / 180;
+            const lat2 = clients[0].latitude * Math.PI / 180;
+            const deltaLat = (clients[0].latitude - latitude) * Math.PI / 180;
+            const deltaLon = (clients[0].longitude - longitude) * Math.PI / 180;
+
+            const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                     Math.cos(lat1) * Math.cos(lat2) *
+                     Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            distance_from_client = R * c; // Distance in kilometers
+        }
+
         const [result] = await pool.execute(
-            `INSERT INTO checkins (employee_id, client_id, latitude, longitude, notes, status)
-             VALUES (?, ?, ?, ?, ?, 'checked_in')`,
-            [req.user.id, client_id, latitude, longitude, notes || null]
+            `INSERT INTO checkins (employee_id, client_id, latitude, longitude, distance_from_client, notes, status)
+             VALUES (?, ?, ?, ?, ?, ?, 'checked_in')`,
+            [req.user.id, client_id, latitude, longitude, distance_from_client, notes || null]
         );
 
         res.status(201).json({
             success: true,
             data: {
                 id: result.insertId,
+                distance_from_client: distance_from_client,
                 message: 'Checked in successfully'
             }
         });
