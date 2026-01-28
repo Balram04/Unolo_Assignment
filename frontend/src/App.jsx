@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import CheckIn from './pages/CheckIn';
 import History from './pages/History';
+import Reports from './pages/Reports';
 import Layout from './components/Layout';
 
 function App() {
@@ -58,8 +59,19 @@ function App() {
                 >
                     <Route index element={<Navigate to="/dashboard" />} />
                     <Route path="dashboard" element={<Dashboard user={user} />} />
-                    <Route path="checkin" element={<CheckIn user={user} />} />
-                    <Route path="history" element={<History user={user} />} />
+                    
+                    {/* Employee-only routes */}
+                    {user && user.role === 'employee' && (
+                        <>
+                            <Route path="checkin" element={<CheckIn user={user} />} />
+                            <Route path="history" element={<History user={user} />} />
+                        </>
+                    )}
+                    
+                    {/* Manager-only routes */}
+                    {user && user.role === 'manager' && (
+                        <Route path="reports" element={<Reports user={user} />} />
+                    )}
                 </Route>
             </Routes>
         </BrowserRouter>
